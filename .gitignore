@@ -1,0 +1,8 @@
+# Directories to ignore
+.trash/
+bootstrap/
+imgs/
+__pycache__/
+
+# Files to ignore
+capture.png
