@@ -94,34 +94,6 @@ function populateRow(predictionData){
   row.appendChild(live_cell);
 
   // Cells 2-4
-  // for (let i = 0; i < 3; i++) {
-  //   res_cell = document.createElement('td');
-  //   let b = document.createElement('button');
-  //   var br = document.createElement('br');
-  //   b.setAttribute('class','btn btn-outline-primary');
-  //   b.setAttribute('data-toggle','modal');
-  //   b.setAttribute('data-target','#verifyModalCenter');
-  //   // b.setAttribute('ontoggle', 'populateVerifyModal({predictionData.handles[i], predictionData.names[i], predictionData.live_img})');
-  //   b.innerHTML = predictionData.handles[i];
-  //   var confidence = document.createTextNode(predictionData.probs[i].toFixed(2));
-  //   let name = document.createTextNode(predictionData.names[i]);
-  //   res_cell.appendChild(b);
-  //   res_cell.appendChild(confidence);
-  //   res_cell.appendChild(br);
-  //   res_cell.appendChild(name);
-  //   b.addEventListener('click', function(){
-  //     if (!paused) {
-  //       pause();
-  //     }
-  //     $('#verifyModalImage').attr("src", predictionData.live_img);
-  //     $('#verifyModalHandle').text(b.innerHTML);
-  //     $('#verifyModalName').text(name.nodeValue);
-  //     $('#verifyModalDegree').val(i);
-  //     // postVerification(b.innerHTML, predictionData.live_img, i);
-  //     // add2Dict(b.innerHTML, name.nodeValue);
-  //   });
-  //   row.appendChild(res_cell);
-  // }
   var predictCells = [];
   for (let i = 0; i < 3; i++) {
     predictCells[i] = buildPredictionCell(predictionData.handles[i], predictionData.probs[i], predictionData.names[i]);
@@ -131,16 +103,11 @@ function populateRow(predictionData){
         pause();
       }
       $('#verifyModalImage').attr("src", predictionData.live_img);
-      // console.dir(predictionData.handles);
       $('#verifyModalHandle').text(predictionData.handles[i]);
       $('#verifyModalName').text(predictionData.names[i]);
       $('#verifyModalDegree').val(i);
       $('#verifyModalNegDegree').val(maxNeg);
       $('#verifyModalNegHandle').val(predictionData.handles[maxNeg]);
-      console.dir(maxNeg);
-      console.dir(predictionData.handles[maxNeg]);
-      // postVerification(b.innerHTML, predictionData.live_img, i);
-      // add2Dict(b.innerHTML, name.nodeValue);
     }
     row.appendChild(predictCells[i]);
   }
@@ -166,6 +133,8 @@ function populateRow(predictionData){
       $('#verifyModalName').text("");
       $('#verifyModalDegree').val(3);
       $('#verifyModalCenter').modal('show');
+      $('#verifyModalNegDegree').val(0);
+      $('#verifyModalNegHandle').val(predictionData.handles[0]);
     } else {
       $('#invalidEmailModal').modal('show');
     }
@@ -291,12 +260,12 @@ function recoverVerify(result) {
   out.innerHTML = result;
 }
 
-function postVerification(handle, dataURI, degree) {
+function postVerification(handle, dataURI, degree, negDegree, negHandle) {
   $.ajax({
     type: "POST",
     url: "verify.py",
     datatype: "json",
-    data: {'handle':handle, 'live-img':dataURI, 'degree':degree},
+    data: {'handle':handle, 'live-img':dataURI, 'degree':degree, 'negDegree':negDegree, 'negHandle':negHandle},
     success: recoverVerify
   });
 }
@@ -352,7 +321,9 @@ function verify(){
   var name = $('#verifyModalName').text();
   var img = $('#verifyModalImage').attr('src');
   var degree = $('#verifyModalDegree').val();
-  postVerification(handle, img, degree);
+  var negDegree = $('#verifyModalNegDegree').val();
+  var negHandle = $('#verifyModalNegHandle').val();
+  postVerification(handle, img, degree, negDegree, negHandle);
   add2Dict(handle, name);
 }
 // function populateVerifyModal(handle, name, live_img){

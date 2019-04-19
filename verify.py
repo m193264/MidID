@@ -7,7 +7,7 @@ import os
 import re
 import csv
 
-def addStats(handle, fname, degree):
+def addStats(timestr, handle, fname, degree, negDegree, negHandle):
     stats_fname = 'l2_stats.csv'
     full_path = 'stats/'+stats_fname
 
@@ -18,8 +18,9 @@ def addStats(handle, fname, degree):
     stats_csv = open(full_path, 'a')
     csv_writer = csv.writer(stats_csv)
     if first:
-        csv_writer.writerow(['Handle', 'File', 'Degree'])
-    csv_writer.writerow([handle, fname, degree])
+        # potentially could add timestr as first field
+        csv_writer.writerow(['Handle', 'File', 'Degree', 'Negative Degree', 'Negative Handle'])
+    csv_writer.writerow([handle, fname, degree, negDegree, negHandle])
     stats_csv.close()
 
 
@@ -30,6 +31,8 @@ data = cgi.FieldStorage()
 handle = data['handle'].value
 dataURI = data['live-img'].value
 degree = data['degree'].value
+negDegree = data['negDegree'].value
+negHandle = data['negHandle'].value
 
 
 ##########################################################################
@@ -45,7 +48,7 @@ imgstr = re.search(r'base64,(.*)', dataURI).group(1)
 decoded = base64.b64decode(imgstr)
 live_img_file.write(decoded)
 live_img_file.close()
-addStats(handle, fname, degree)
+addStats(timestr, handle, fname, degree, negDegree, negHandle)
 
 res = {}
 res['verified'] = True
